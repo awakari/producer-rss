@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package resolver;
+
+option go_package = "api/grpc/resolver";
+
+import "google/protobuf/empty.proto";
+import "api/grpc/cloudevents/cloudevent.proto";
+
+service Service {
+  rpc Submit(pb.CloudEvent) returns (google.protobuf.Empty);
+}
