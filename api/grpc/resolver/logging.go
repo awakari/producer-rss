@@ -23,7 +23,16 @@ func NewLoggingMiddleware(svc Service, log *slog.Logger) Service {
 
 func (lm loggingMiddleware) Submit(ctx context.Context, msg *event.Event) (err error) {
 	defer func() {
-		lm.log.Debug(fmt.Sprintf("resolver.Submit(msg.Id=%s): %s", msg.ID(), err))
+		lm.log.Debug(
+			fmt.Sprintf(
+				"resolver.Submit(msg(id: \"%s\", source: \"%s\" subject: \"%s\" time: %s)): %s",
+				msg.ID(),
+				msg.Source(),
+				msg.Subject(),
+				msg.Time(),
+				err,
+			),
+		)
 	}()
 	return lm.svc.Submit(ctx, msg)
 }

@@ -33,8 +33,7 @@ run: docker
 	docker run \
 		-d \
 		--name awakari-producer-rss \
-		-p 8080:8080 \
-		--expose 8080 \
+		--volume $(shell pwd)/config/feeds.txt:/etc/feeds.txt \
 		awakari/producer-rss
 
 staging: docker

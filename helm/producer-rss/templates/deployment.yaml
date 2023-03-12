@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "producer-rss.fullname" . }}
+  labels:
+    {{- include "producer-rss.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "producer-rss.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "producer-rss.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "producer-rss.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          env:
+            - name: API_PORT
+              value: "{{ .Values.service.port }}"
+            - name: API_CONDITIONS_KIWI_TREE_COMPLETE_URI
+              value: {{ .Values.api.conditions.kiwi.tree.completeUri }}
+            - name: API_CONDITIONS_KIWI_TREE_PARTIAL_URI
+              value: {{ .Values.api.conditions.kiwi.tree.partialUri }}
+            - name: API_CONDITIONS_KIWI_BATCH_SIZE
+              value: "{{ .Values.api.conditions.kiwi.batchSize }}"
+            - name: API_SUBSCRIPTIONS_URI
+              value: {{ .Values.api.subscriptions.uri }}
+            - name: API_SUBSCRIPTIONS_BATCH_SIZE
+              value: "{{ .Values.api.subscriptions.batchSize }}"
+            - name: API_MATCHES_URI
+              value: {{ .Values.api.matches.uri }}
+            - name: API_ROUTER_URI
+              value: {{ .Values.api.router.uri }}
+            - name: LOG_LEVEL
+              value: "{{ .Values.log.level }}"
+            - name: QUEUE_BATCH_SIZE
+              value: "{{ .Values.queue.batchSize }}"
+            - name: QUEUE_FALLBACK_ENABLED
+              value: "{{ .Values.queue.fallback.enabled }}"
+            - name: QUEUE_FALLBACK_SUFFIX
+              value: "{{ .Values.queue.fallback.suffix }}"
+            - name: QUEUE_LIMIT
+              value: "{{ .Values.queue.limit }}"
+            - name: QUEUE_NAME
+              value: "{{ .Release.Name }}"
+            - name: QUEUE_SLEEP_ON_EMPTY_MILLIS
+              value: "{{ .Values.queue.sleepOn.emptyMillis }}"
+            - name: QUEUE_SLEEP_ON_ERROR_MILLIS
+              value: "{{ .Values.queue.sleepOn.errorMillis }}"
+            - name: QUEUE_URI
+              value: "{{ .Values.queue.uri }}"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: grpc
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+            grpc:
+              port: {{ .Values.service.port }}
+          readinessProbe:
+            grpc:
+              port: {{ .Values.service.port }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
