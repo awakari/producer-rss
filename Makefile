@@ -33,7 +33,7 @@ run: docker
 	docker run \
 		-d \
 		--name awakari-producer-rss \
-		--volume $(shell pwd)/config/feeds.txt:/etc/feeds.txt \
+		--volume $(shell pwd)/config/feed-urls.txt:/etc/feed-urls.txt \
 		awakari/producer-rss
 
 staging: docker

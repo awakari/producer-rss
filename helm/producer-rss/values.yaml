@@ -82,7 +82,36 @@ affinity: {}
 
 api:
   resolver:
+    backoff: "10s"
     uri: "resolver:8080"
+feed:
+  tls:
+    skipVerify: true
+  updateInterval:
+    min: "10s"
+    max: "10m"
+  updateTimeout: "1m"
+  urlsPath: "feed-urls.txt"
+  userAgent: "awakari-producer-rss/0.0.1"
 log:
   # https://pkg.go.dev/golang.org/x/exp/slog#Level
   level: -4
+message:
+  metadata:
+    key:
+      feedCategories: "feedcategories"
+      feedDescription: "feeddescription"
+      feedImageTitle: "feedimagetitle"
+      feedImageUrl: "feedimageurl"
+      feedTitle: "feedtitle"
+      author: "author"
+      categories: "categories"
+      guid: "rssitemguid"
+      imageTitle: "imagetitle"
+      imageUrl: "imageurl"
+      language: "language"
+      summary: "summary"
+      title: "title"
+    specVersion: "1.0"
+  content:
+    type: "text/html"

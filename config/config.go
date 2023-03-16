@@ -8,7 +8,8 @@ import (
 type Config struct {
 	Api struct {
 		Resolver struct {
-			Uri string `envconfig:"API_RESOLVER_URI" default:"resolver:8080" required:"true"`
+			Backoff time.Duration `envconfig:"API_RESOLVER_BACKOFF" default:"10s" required:"true"`
+			Uri     string        `envconfig:"API_RESOLVER_URI" default:"resolver:8080" required:"true"`
 		}
 	}
 	Feed FeedConfig
@@ -19,8 +20,10 @@ type Config struct {
 }
 
 type FeedConfig struct {
-	UpdateIntervalMin time.Duration `envconfig:"FEED_UPDATE_INTERVAL_MIN" default:"1s" required:"true"`
-	UpdateIntervalMax time.Duration `envconfig:"FEED_UPDATE_INTERVAL_MAX" default:"1m" required:"true"`
+	TlsSkipVerify     bool          `envconfig:"FEED_TLS_SKIP_VERIFY" default:"true" required:"true"`
+	UpdateIntervalMin time.Duration `envconfig:"FEED_UPDATE_INTERVAL_MIN" default:"10s" required:"true"`
+	UpdateIntervalMax time.Duration `envconfig:"FEED_UPDATE_INTERVAL_MAX" default:"10m" required:"true"`
+	UpdateTimeout     time.Duration `envconfig:"FEED_UPDATE_TIMEOUT" default:"1m" required:"true"`
 	Urls              []string      // to be set externally
 	UserAgent         string        `envconfig:"FEED_USER_AGENT" default:"awakari-producer-rss/0.0.1" required:"true"`
 }
@@ -51,7 +54,7 @@ type MetadataConfig struct {
 }
 
 type ContentConfig struct {
-	Type string `envconfig:"MSG_CONTENT_TYPE" default:"text/html" required:"true"`
+	Type string `envconfig:"MSG_CONTENT_TYPE" default:"text/plain" required:"true"`
 }
 
 func NewConfigFromEnv() (cfg Config, err error) {

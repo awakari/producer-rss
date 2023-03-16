@@ -15,6 +15,7 @@ spec:
     metadata:
       {{- with .Values.podAnnotations }}
       annotations:
+        networking.k8s.io/network-policy: producer-rss-allow-fetch-from-internet
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
@@ -30,40 +31,52 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           env:
-            - name: API_PORT
-              value: "{{ .Values.service.port }}"
-            - name: API_CONDITIONS_KIWI_TREE_COMPLETE_URI
-              value: {{ .Values.api.conditions.kiwi.tree.completeUri }}
-            - name: API_CONDITIONS_KIWI_TREE_PARTIAL_URI
-              value: {{ .Values.api.conditions.kiwi.tree.partialUri }}
-            - name: API_CONDITIONS_KIWI_BATCH_SIZE
-              value: "{{ .Values.api.conditions.kiwi.batchSize }}"
-            - name: API_SUBSCRIPTIONS_URI
-              value: {{ .Values.api.subscriptions.uri }}
-            - name: API_SUBSCRIPTIONS_BATCH_SIZE
-              value: "{{ .Values.api.subscriptions.batchSize }}"
-            - name: API_MATCHES_URI
-              value: {{ .Values.api.matches.uri }}
-            - name: API_ROUTER_URI
-              value: {{ .Values.api.router.uri }}
+            - name: API_RESOLVER_BACKOFF
+              value: "{{ .Values.api.resolver.backoff }}"
+            - name: API_RESOLVER_URI
+              value: "{{ .Values.api.resolver.uri }}"
             - name: LOG_LEVEL
               value: "{{ .Values.log.level }}"
-            - name: QUEUE_BATCH_SIZE
-              value: "{{ .Values.queue.batchSize }}"
-            - name: QUEUE_FALLBACK_ENABLED
-              value: "{{ .Values.queue.fallback.enabled }}"
-            - name: QUEUE_FALLBACK_SUFFIX
-              value: "{{ .Values.queue.fallback.suffix }}"
-            - name: QUEUE_LIMIT
-              value: "{{ .Values.queue.limit }}"
-            - name: QUEUE_NAME
-              value: "{{ .Release.Name }}"
-            - name: QUEUE_SLEEP_ON_EMPTY_MILLIS
-              value: "{{ .Values.queue.sleepOn.emptyMillis }}"
-            - name: QUEUE_SLEEP_ON_ERROR_MILLIS
-              value: "{{ .Values.queue.sleepOn.errorMillis }}"
-            - name: QUEUE_URI
-              value: "{{ .Values.queue.uri }}"
+            - name: FEED_TLS_SKIP_VERIFY
+              value: "{{ .Values.feed.tls.skipVerify }}"
+            - name: FEED_UPDATE_INTERVAL_MIN
+              value: "{{ .Values.feed.updateInterval.min }}"
+            - name: FEED_UPDATE_INTERVAL_MAX
+              value: "{{ .Values.feed.updateInterval.max }}"
+            - name: FEED_UPDATE_TIMEOUT
+              value: "{{ .Values.feed.updateTimeout }}"
+            - name: FEED_USER_AGENT
+              value: "{{ .Values.feed.userAgent }}"
+            - name: MSG_MD_KEY_FEED_CATEGORIES
+              value: "{{ .Values.message.metadata.key.feedCategories }}"
+            - name: MSG_MD_KEY_FEED_DESCRIPTION
+              value: "{{ .Values.message.metadata.key.feedDescription }}"
+            - name: MSG_MD_KEY_FEED_IMAGE_TITLE
+              value: "{{ .Values.message.metadata.key.feedImageTitle }}"
+            - name: MSG_MD_KEY_FEED_IMAGE_URL
+              value: "{{ .Values.message.metadata.key.feedImageUrl }}"
+            - name: MSG_MD_KEY_FEED_TITLE
+              value: "{{ .Values.message.metadata.key.feedTitle }}"
+            - name: MSG_MD_KEY_AUTHOR
+              value: "{{ .Values.message.metadata.key.author }}"
+            - name: MSG_MD_KEY_CATEGORIES
+              value: "{{ .Values.message.metadata.key.categories }}"
+            - name: MSG_MD_KEY_GUID
+              value: "{{ .Values.message.metadata.key.guid }}"
+            - name: MSG_MD_KEY_IMAGE_TITLE
+              value: "{{ .Values.message.metadata.key.imageTitle }}"
+            - name: MSG_MD_KEY_IMAGE_URL
+              value: "{{ .Values.message.metadata.key.imageUrl }}"
+            - name: MSG_MD_KEY_LANGUAGE
+              value: "{{ .Values.message.metadata.key.language }}"
+            - name: MSG_MD_KEY_SUMMARY
+              value: "{{ .Values.message.metadata.key.summary }}"
+            - name: MSG_MD_KEY_TITLE
+              value: "{{ .Values.message.metadata.key.title }}"
+            - name: MSG_MD_SPEC_VERSION
+              value: "{{ .Values.message.metadata.specVersion }}"
+            - name: MSG_CONTENT_TYPE
+              value: "{{ .Values.message.content.type }}"
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -72,14 +85,18 @@ spec:
             - name: grpc
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-          livenessProbe:
-            grpc:
-              port: {{ .Values.service.port }}
-          readinessProbe:
-            grpc:
-              port: {{ .Values.service.port }}
+          livenessProbe: null
+          readinessProbe: null
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /etc/feed-urls.txt
+              name: {{ .Release.Name }}-feed-urls-config
+              subPath: feed-urls.txt
+      volumes:
+        - name: {{ .Release.Name }}-feed-urls-config
+          configMap:
+            name: {{ .Release.Name }}-feed-urls-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

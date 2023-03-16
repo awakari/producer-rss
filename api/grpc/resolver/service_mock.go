@@ -6,20 +6,28 @@ import (
 )
 
 type serviceMock struct {
+	hasCapacity bool
 }
 
 func NewServiceMock() Service {
-	return serviceMock{}
+	return &serviceMock{}
 }
 
-func (sm serviceMock) Submit(ctx context.Context, msg *event.Event) (err error) {
-	switch msg.ID() {
-	case "resolver_fail":
-		return ErrInternal
-	case "resolver_queue_full":
-		return ErrQueueFull
-	case "resolver_queue_missing":
-		return ErrQueueMissing
+func (sm *serviceMock) SubmitBatch(ctx context.Context, msgs []*event.Event) (count uint32, err error) {
+	for _, msg := range msgs {
+		if msg.ID() == "resolver_fail" {
+			err = ErrInternal
+			break
+		}
+		if msg.ID() == "resolver_queue_missing" {
+			err = ErrQueueMissing
+			break
+		}
+		if msg.ID() == "full" && !sm.hasCapacity {
+			sm.hasCapacity = true
+			break
+		}
+		count++
 	}
 	return
 }

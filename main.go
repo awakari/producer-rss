@@ -2,8 +2,12 @@ package main
 
 import (
 	"bufio"
+	"crypto/tls"
 	"fmt"
 	"golang.org/x/exp/slog"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"net/http"
 	"os"
 	"producer-rss/api/grpc/resolver"
 	"producer-rss/config"
@@ -38,24 +42,35 @@ func main() {
 		cfg.Feed.Urls = append(cfg.Feed.Urls, feed)
 	}
 	//
-	//resolverConn, err := grpc.Dial(
-	//	cfg.Api.Resolver.Uri,
-	//	grpc.WithTransportCredentials(insecure.NewCredentials()),
-	//)
-	//if err != nil {
-	//	log.Error("failed to connect to the resolver service", err)
-	//}
-	//resolverClient := resolver.NewServiceClient(resolverConn)
-	//resolverSvc := resolver.NewService(resolverClient)
-	resolverSvc := resolver.NewServiceMock()
+	resolverConn, err := grpc.Dial(
+		cfg.Api.Resolver.Uri,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		log.Error("failed to connect to the resolver service", err)
+	}
+	resolverClient := resolver.NewServiceClient(resolverConn)
+	resolverSvc := resolver.NewService(resolverClient)
+	// resolverSvc := resolver.NewServiceMock() // uncomment for the local testing
 	resolverSvc = resolver.NewLoggingMiddleware(resolverSvc, log)
 	//
-	svc, err := service.NewService(cfg.Feed, cfg.Message, resolverSvc)
+	httpClient := http.Client{
+		Timeout: cfg.Feed.UpdateTimeout,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: cfg.Feed.TlsSkipVerify,
+			},
+		},
+	}
+	feedsClient := service.NewClient(httpClient, cfg.Feed.UserAgent)
+	feedsClient = service.NewLoggingMiddleware(feedsClient, log)
+	//
+	svc, err := service.NewService(cfg.Feed, feedsClient, cfg.Message, cfg.Api.Resolver.Backoff, resolverSvc)
 	if err != nil {
 		log.Error("service init error", err)
 	}
-	log.Info("starting the feeds processing")
 	errChan := make(chan error)
+	log.Info("starting the feeds processing")
 	go svc.ProcessLoop(errChan)
 	for {
 		err = <-errChan

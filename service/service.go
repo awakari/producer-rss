@@ -6,7 +6,6 @@ import (
 	"github.com/SlyMarbo/rss"
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/google/uuid"
-	"net/http"
 	"net/url"
 	"producer-rss/api/grpc/resolver"
 	"producer-rss/config"
@@ -20,45 +19,37 @@ type Service interface {
 
 type service struct {
 	feeds             []*rss.Feed
-	fetchFunc         func(url string) (resp *http.Response, err error)
+	feedsClient       Client
 	updateIntervalMin time.Duration
+	updateIntervalMax time.Duration
 	msgCfg            config.MessageConfig
+	resolverBackoff   time.Duration
 	resolverSvc       resolver.Service
 }
 
-func NewService(feedCfg config.FeedConfig, msgCfg config.MessageConfig, resolverSvc resolver.Service) (svc Service, err error) {
+func NewService(feedCfg config.FeedConfig, feedsClient Client, msgCfg config.MessageConfig, resolverBackoff time.Duration, resolverSvc resolver.Service) (svc Service, err error) {
 	var feeds []*rss.Feed
-	rss.DefaultRefreshInterval = feedCfg.UpdateIntervalMax
-	fetchFunc := func(url string) (resp *http.Response, err error) {
-		return fetch(url, feedCfg.UserAgent)
-	}
 	for _, feedUrl := range feedCfg.Urls {
-		feed, fetchErr := rss.FetchByFunc(fetchFunc, feedUrl)
+		feed, fetchErr := rss.FetchByFunc(feedsClient.Get, feedUrl)
 		if fetchErr != nil {
 			err = errors.Join(err, fetchErr)
 		} else {
+			if feed.Refresh.Sub(time.Now()) > feedCfg.UpdateIntervalMax {
+				feed.Refresh = time.Now().Add(feedCfg.UpdateIntervalMax)
+			}
 			feeds = append(feeds, feed)
 		}
 	}
-	if err == nil {
-		svc = service{
-			feeds:             feeds,
-			fetchFunc:         fetchFunc,
-			updateIntervalMin: feedCfg.UpdateIntervalMin,
-			msgCfg:            msgCfg,
-			resolverSvc:       resolverSvc,
-		}
+	svc = service{
+		feeds:             feeds,
+		feedsClient:       feedsClient,
+		updateIntervalMin: feedCfg.UpdateIntervalMin,
+		updateIntervalMax: feedCfg.UpdateIntervalMax,
+		msgCfg:            msgCfg,
+		resolverBackoff:   resolverBackoff,
+		resolverSvc:       resolverSvc,
 	}
-	return svc, err
-}
-
-func fetch(url, userAgent string) (resp *http.Response, err error) {
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("User-Agent", userAgent)
-	return http.DefaultClient.Do(req)
+	return
 }
 
 func (svc service) ProcessLoop(errChan chan<- error) {
@@ -83,33 +74,56 @@ func (svc service) ProcessFeeds() (err error) {
 
 func (svc service) processFeed(feed *rss.Feed) (err error) {
 	if feed.Refresh.Before(time.Now()) {
-		err = feed.UpdateByFunc(svc.fetchFunc)
+		err = feed.UpdateByFunc(svc.feedsClient.Get)
+		if feed.Refresh.Sub(time.Now()) > svc.updateIntervalMax {
+			feed.Refresh = time.Now().Add(svc.updateIntervalMax)
+		}
 		if err == nil {
-			msgs := svc.convertToMessages(feed)
-			err = processMessages(svc.resolverSvc, msgs)
+			var msgs []*event.Event
+			msgs, err = svc.convertToMessages(feed)
+			if err == nil && len(msgs) > 0 {
+				err = svc.processMessages(msgs)
+			}
 		}
 	}
 	return
 }
 
-func (svc service) convertToMessages(feed *rss.Feed) (msgs []*event.Event) {
+func (svc service) convertToMessages(feed *rss.Feed) (msgs []*event.Event, err error) {
+	var msg *event.Event
 	for _, item := range feed.Items {
 		if !item.Read {
 			item.Read = true
-			msg := svc.convertToMessage(feed, item)
+			msg, err = svc.convertToMessage(feed, item)
 			msgs = append(msgs, msg)
 		}
 	}
 	return
 }
 
-func (svc service) convertToMessage(feed *rss.Feed, item *rss.Item) *event.Event {
-	msg := event.New()
+func (svc service) processMessages(msgs []*event.Event) (err error) {
+	msgCount := uint32(len(msgs))
+	var ackCount, n uint32
+	for ackCount < msgCount {
+		n, err = svc.resolverSvc.SubmitBatch(context.TODO(), msgs[ackCount:])
+		ackCount += n
+		if err != nil {
+			break
+		}
+		if n == 0 {
+			time.Sleep(svc.resolverBackoff)
+		}
+	}
+	return
+}
+
+func (svc service) convertToMessage(feed *rss.Feed, item *rss.Item) (msg *event.Event, err error) {
+	msg = &event.Event{}
+	msg.SetSpecVersion(svc.msgCfg.Metadata.SpecVersion)
 	msg.SetID(uuid.NewString())
 	msg.SetSource(feed.Link)
 	msg.SetSubject(item.Link)
 	msg.SetTime(item.Date)
-	msg.SetSpecVersion(svc.msgCfg.Metadata.SpecVersion)
 	if feed.Author != "" {
 		msg.SetExtension(svc.msgCfg.Metadata.KeyAuthor, feed.Author)
 	}
@@ -139,6 +153,9 @@ func (svc service) convertToMessage(feed *rss.Feed, item *rss.Item) *event.Event
 	if item.ID != "" {
 		msg.SetExtension(svc.msgCfg.Metadata.KeyGuid, item.ID)
 	}
+	if len(item.Categories) > 0 {
+		msg.SetExtension(svc.msgCfg.Metadata.KeyCategories, strings.Join(item.Categories, " "))
+	}
 	if item.Image == nil {
 		for _, encl := range item.Enclosures {
 			if strings.HasPrefix(encl.Type, "image/") {
@@ -161,32 +178,13 @@ func (svc service) convertToMessage(feed *rss.Feed, item *rss.Item) *event.Event
 		}
 	}
 	if item.Summary != "" {
-		_ = msg.SetData(svc.msgCfg.Content.Type, item.Summary)
+		msg.SetExtension(svc.msgCfg.Metadata.KeySummary, item.Summary)
 	}
 	if item.Title != "" {
 		msg.SetExtension(svc.msgCfg.Metadata.KeyTitle, item.Title)
 	}
-	return &msg
-}
-
-func processMessages(resolverSvc resolver.Service, msgs []*event.Event) (err error) {
-	for _, msg := range msgs {
-		nextErr := processMessage(resolverSvc, msg)
-		if nextErr != nil {
-			err = errors.Join(err, nextErr)
-		}
-	}
-	return
-}
-
-func processMessage(resolverSvc resolver.Service, msg *event.Event) (err error) {
-	for {
-		err = resolverSvc.Submit(context.TODO(), msg)
-		if errors.Is(err, resolver.ErrQueueFull) {
-
-		} else {
-			break
-		}
+	if item.Content != "" {
+		err = msg.SetData(svc.msgCfg.Content.Type, item.Content)
 	}
 	return
 }

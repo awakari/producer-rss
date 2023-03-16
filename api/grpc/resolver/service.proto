@@ -4,9 +4,17 @@ package resolver;
 
 option go_package = "api/grpc/resolver";
 
-import "google/protobuf/empty.proto";
 import "api/grpc/cloudevents/cloudevent.proto";
 
 service Service {
-  rpc Submit(pb.CloudEvent) returns (google.protobuf.Empty);
+  rpc SubmitBatch(SubmitBatchRequest) returns (BatchResponse);
+}
+
+message SubmitBatchRequest {
+  repeated pb.CloudEvent msgs = 1;
+}
+
+message BatchResponse {
+  uint32 count = 1;
+  string err = 2;
 }
