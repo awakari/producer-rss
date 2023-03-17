@@ -5,13 +5,18 @@ on:
     branches:
       - "master"
 
+env:
+  COMPONENT: producer-rss
+  VERSION: latest
+  CHART_VERSION: 0.0.0
+
 jobs:
 
   staging:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
 
       - name: Registry login
         uses: docker/login-action@v2
@@ -22,3 +27,27 @@ jobs:
 
       - name: Staging
         run: make staging
+
+  helm:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.7.0
+
+      - name: Build Helm Chart
+        run: |
+          mkdir helm/package
+          helm package helm/${COMPONENT}/ --version ${CHART_VERSION} --destination helm/package
+          cd helm/package
+          helm repo index .
+
+      - name: Publish Helm Chart
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: helm/package/
