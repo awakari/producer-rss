@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  producer-rss:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2023-03-17T14:42:44.93451253Z"
+    description: A Helm chart for Awakari producer-rss
+    digest: 6c5e69ab55cf16d92ec46e95daa563ebc3683176c2e18aec4339a4891fa8b742
+    name: producer-rss
+    type: application
+    urls:
+    - producer-rss-0.0.0.tgz
+    version: 0.0.0
+generated: "2023-03-17T14:42:44.933598131Z"
