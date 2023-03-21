@@ -47,7 +47,7 @@ func main() {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
-		log.Error("failed to connect to the resolver service", err)
+		panic(err)
 	}
 	resolverClient := resolver.NewServiceClient(resolverConn)
 	resolverSvc := resolver.NewService(resolverClient)
