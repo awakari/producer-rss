@@ -10,7 +10,9 @@ import (
 	"net/http"
 	"os"
 	"producer-rss/config"
+	"producer-rss/converter"
 	"producer-rss/feeds"
+	"producer-rss/producer"
 	"time"
 )
 
@@ -77,11 +79,12 @@ func main() {
 	if err != nil {
 		log.Error(fmt.Sprintf("failed to fetch the feed @ %s:", cfg.Feed.Url), err)
 	}
+	log.Info(fmt.Sprintf("feed contains %d items to process", len(feed.Items)))
 	//
-	conv := NewConverter(cfg.Message)
-	conv = NewConverterLogging(conv, log)
-	prod := NewProducer(feed, feedUpdTime, conv, ws, cfg.Api.Writer.Backoff)
-	prod = NewProducerLogging(prod, log)
+	conv := converter.NewConverter(cfg.Message)
+	conv = converter.NewConverterLogging(conv, log)
+	prod := producer.NewProducer(feed, feedUpdTime, conv, ws, cfg.Api.Writer.Backoff)
+	prod = producer.NewProducerLogging(prod, log)
 	//
 	var newFeedUpdTime time.Time
 	if err == nil {

@@ -1,11 +1,13 @@
-package main
+package producer
 
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/SlyMarbo/rss"
 	"github.com/awakari/client-sdk-go/model"
 	"github.com/cloudevents/sdk-go/binding/format/protobuf/v2/pb"
+	"producer-rss/converter"
 	"time"
 )
 
@@ -16,12 +18,12 @@ type Producer interface {
 type producer struct {
 	feed          *rss.Feed
 	timeMin       time.Time
-	conv          Converter
+	conv          converter.Converter
 	output        model.WriteStream[*pb.CloudEvent]
 	outputBackoff time.Duration
 }
 
-func NewProducer(feed *rss.Feed, timeMin time.Time, conv Converter, output model.WriteStream[*pb.CloudEvent], outputBackoff time.Duration) Producer {
+func NewProducer(feed *rss.Feed, timeMin time.Time, conv converter.Converter, output model.WriteStream[*pb.CloudEvent], outputBackoff time.Duration) Producer {
 	return producer{
 		feed:          feed,
 		timeMin:       timeMin,
@@ -48,6 +50,8 @@ func (p producer) getNewMessages() (msgs []*pb.CloudEvent, nextTime time.Time, e
 			msg, itemErr = p.conv.Convert(p.feed, item)
 			msgs = append(msgs, msg)
 			err = errors.Join(err, itemErr)
+		} else {
+			fmt.Printf("item date %s is before the min time %s\n", item.Date.Format(time.RFC3339), p.timeMin.Format(time.RFC3339))
 		}
 		if nextTime.Before(item.Date) {
 			nextTime = item.Date
