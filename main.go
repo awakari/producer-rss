@@ -67,7 +67,8 @@ func main() {
 	defer awakariClient.Close()
 	log.Info("initialized the Awakari API client")
 	//
-	ws, err := awakariClient.WriteMessages(context.TODO(), "producer-rss")
+	groupIdCtx := context.WithValue(ctx, "x-awakari-group-id", "producer-rss")
+	ws, err := awakariClient.WriteMessages(groupIdCtx, "producer-rss")
 	if err != nil {
 		panic(fmt.Sprintf("failed to open the messages write stream: %s", err))
 	}
@@ -77,7 +78,7 @@ func main() {
 	var feed *rss.Feed
 	feed, err = rss.FetchByFunc(feedsClient.Get, cfg.Feed.Url)
 	if err != nil {
-		log.Error(fmt.Sprintf("failed to fetch the feed @ %s:", cfg.Feed.Url), err)
+		log.Error(fmt.Sprintf("failed to fetch the feed: %s:", err))
 	}
 	log.Info(fmt.Sprintf("feed contains %d items to process", len(feed.Items)))
 	//
@@ -91,7 +92,7 @@ func main() {
 		newFeedUpdTime, err = prod.Produce(ctx)
 	}
 	if err != nil {
-		log.Error(fmt.Sprintf("failed to process the feed @ %s:", cfg.Feed.Url), err)
+		log.Error(fmt.Sprintf("failed to process the feed: %s", err))
 	}
 	if newFeedUpdTime.After(feedUpdTime) {
 		log.Info(fmt.Sprintf("setting the new update time to %s", newFeedUpdTime.Format(time.RFC3339)))
