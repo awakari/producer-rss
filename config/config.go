@@ -7,11 +7,12 @@ import (
 
 type Config struct {
 	Api struct {
-		Resolver struct {
-			Backoff time.Duration `envconfig:"API_RESOLVER_BACKOFF" default:"10s" required:"true"`
-			Uri     string        `envconfig:"API_RESOLVER_URI" default:"resolver:8080" required:"true"`
+		Writer struct {
+			Backoff time.Duration `envconfig:"API_WRITER_BACKOFF" default:"10s" required:"true"`
+			Uri     string        `envconfig:"API_WRITER_URI" default:"writer:50051" required:"true"`
 		}
 	}
+	Db   DbConfig
 	Feed FeedConfig
 	Log  struct {
 		Level int `envconfig:"LOG_LEVEL" default:"-4" required:"true"`
@@ -19,12 +20,26 @@ type Config struct {
 	Message MessageConfig
 }
 
+type DbConfig struct {
+	Uri      string `envconfig:"DB_URI" default:"mongodb://localhost:27017/?retryWrites=true&w=majority" required:"true"`
+	Name     string `envconfig:"DB_NAME" default:"producer-rss" required:"true"`
+	UserName string `envconfig:"DB_USERNAME" default:""`
+	Password string `envconfig:"DB_PASSWORD" default:""`
+	Table    struct {
+		Name string `envconfig:"DB_TABLE_NAME" default:"feeds" required:"true"`
+	}
+	Tls struct {
+		Enabled  bool `envconfig:"DB_TLS_ENABLED" default:"false" required:"true"`
+		Insecure bool `envconfig:"DB_TLS_INSECURE" default:"false" required:"true"`
+	}
+}
+
 type FeedConfig struct {
+	Url               string        `envconfig:"FEED_URL" required:"true"`
 	TlsSkipVerify     bool          `envconfig:"FEED_TLS_SKIP_VERIFY" default:"true" required:"true"`
 	UpdateIntervalMin time.Duration `envconfig:"FEED_UPDATE_INTERVAL_MIN" default:"10s" required:"true"`
 	UpdateIntervalMax time.Duration `envconfig:"FEED_UPDATE_INTERVAL_MAX" default:"10m" required:"true"`
 	UpdateTimeout     time.Duration `envconfig:"FEED_UPDATE_TIMEOUT" default:"1m" required:"true"`
-	Urls              []string      // to be set externally
 	UserAgent         string        `envconfig:"FEED_USER_AGENT" default:"awakari-producer-rss/0.0.1" required:"true"`
 }
 

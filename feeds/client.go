@@ -1,4 +1,4 @@
-package service
+package feeds
 
 import "net/http"
 

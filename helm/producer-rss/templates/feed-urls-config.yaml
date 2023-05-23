@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ .Release.Name }}-feed-urls-config
-data:
-  feed-urls.txt: {{ .Files.Get .Values.feed.urlsPath | quote }}

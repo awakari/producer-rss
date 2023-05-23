@@ -1,0 +1,11 @@
+# Database related configuration.
+db:
+  # Database connection URI.
+  protocol: "mongodb+srv"
+  hostname: "dev0.n5hqdgn.mongodb.net"
+  username: "akurilov"
+  password:
+    raw: "Yh8yXqDNOPnfILI2"
+tls:
+  enabled: true
+  insecure: true
