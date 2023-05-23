@@ -17,3 +17,4 @@ cover.tmp
 vendor/
 **/*.pb.go
 producer-rss-*.tgz
+helm/producer-rss/values-dev.yaml

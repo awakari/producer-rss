@@ -99,6 +99,6 @@ func main() {
 		err = stor.SetUpdateTime(ctx, cfg.Feed.Url, newFeedUpdTime)
 	}
 	if err != nil {
-		log.Error(fmt.Sprintf("failed to set the new update time for the feed @ %s:", cfg.Feed.Url), err)
+		log.Error(fmt.Sprintf("failed to set the new update time for the feed: %s:", err))
 	}
 }
