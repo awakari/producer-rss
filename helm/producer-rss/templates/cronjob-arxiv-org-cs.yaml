@@ -1,18 +1,17 @@
-{{- range $feed := .Values.feed.list }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
   labels:
     app: "producer-rss"
-  name: "{{ include "producer-rss.fullname" . }}-{{ $feed.name }}"
+  name: "{{ include "producerRss.fullname" . }}-arxiv-org-cs"
 spec:
-  schedule: "{{ $feed.schedule }}"
+  schedule: "* * * * *"
   jobTemplate:
     spec:
       template:
         spec:
           containers:
-            - name: "{{ include "producer-rss.fullname" . }}-{{ $feed.name }}"
+            - name: "{{ include "producerRss.fullname" . }}-arxiv-org-cs"
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
               env:
                 - name: API_WRITER_BACKOFF
@@ -44,7 +43,7 @@ spec:
                 - name: LOG_LEVEL
                   value: "{{ .Values.log.level }}"
                 - name: FEED_URL
-                  value: "{{ $feed.url }}"
+                  value: "http://export.arxiv.org/rss/cs"
                 - name: FEED_TLS_SKIP_VERIFY
                   value: "{{ .Values.feed.tls.skipVerify }}"
                 - name: FEED_UPDATE_INTERVAL_MIN
@@ -86,4 +85,3 @@ spec:
                 - name: MSG_CONTENT_TYPE
                   value: "{{ .Values.message.content.type }}"
           restartPolicy: OnFailure
-{{- end }}

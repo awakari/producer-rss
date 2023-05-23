@@ -83,7 +83,7 @@ affinity: {}
 api:
   writer:
     backoff: "10s"
-    uri: "writer:50051"
+    uri: "core-writer:50051"
 db:
   protocol: mongodb
   hostname: core-mongodb

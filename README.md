@@ -39,30 +39,31 @@ TODO
 
 The service is configurable using the environment variables:
 
-| Variable                    | Example value                | Description                                                                               |
-|-----------------------------|------------------------------|-------------------------------------------------------------------------------------------|
-| API_RESOLVER_BACKOFF        | `10s`                        | Time to sleep before a retry when resolver fails to accept all messages                   |
-| API_RESOLVER_URI            | `resolver:8080`              | [Resolver](https://github.com/awakari/resolver) dependency service URI                    |
-| LOG_LEVEL                   | `-4`                         | [Logging level](https://pkg.go.dev/golang.org/x/exp/slog#Level)                           |
-| FEED_TLS_SKIP_VERIFY        | `true`                       | Defines whether producer should skip the TLS certificate check when fetching the RSS feed |
-| FEED_UPDATE_INTERVAL_MIN    | `10s`                        | Minimum possible feed update interval                                                     |
-| FEED_UPDATE_INTERVAL_MAX    | `10m`                        | Maximum pssible feed update interval                                                      |
-| FEED_UPDATE_TIMEOUT         | `1m`                         | Timeout to fetch the RSS feed                                                             |
-| FEED_USER_AGENT             | `awakari-producer-rss/0.0.1` | HTTP user agent to use to fetch any RSS feed                                              |
-| MSG_MD_KEY_FEED_CATEGORIES  | `feedcategories`             | Cloud Event attribute name to use for the feed categories                                 |
-| MSG_MD_KEY_FEED_DESCRIPTION | `feeddescription`            | Cloud Event attribute name to use for the feed description                                |
-| MSG_MD_KEY_FEED_IMAGE_TITLE | `feedimagetitle`             | Cloud Event attribute name to use for the feed image title                                |
-| MSG_MD_KEY_FEED_IMAGE_URL   | `feedimageurl`               | Cloud Event attribute name to use for the feed image URL                                  |
-| MSG_MD_KEY_FEED_TITLE       | `feedtitle`                  | Cloud Event attribute name to use for the feed title                                      |
-| MSG_MD_KEY_AUTHOR           | `author`                     | Cloud Event attribute name to use for the RSS item author                                 |
-| MSG_MD_KEY_CATEGORIES       | `categories`                 | Cloud Event attribute name to use for the RSS item categories                             |
-| MSG_MD_KEY_GUID             | `rssitemguid`                | Cloud Event attribute name to use for the RSS item GUID                                   |
-| MSG_MD_KEY_IMAGE_TITLE      | `imagetitle`                 | Cloud Event attribute name to use for the RSS item image title                            |
-| MSG_MD_KEY_IMAGE_URL        | `imageurl`                   | Cloud Event attribute name to use for the RSS item image URL                              |
-| MSG_MD_KEY_TITLE            | `title`                      | Cloud Event attribute name to use for the RSS item title                                  |
-| MSG_MD_KEY_LANGUAGE         | `language`                   | Cloud Event attribute name to use for the RSS item language                               |
-| MSG_MD_KEY_SUMMARY          | `summary`                    | Cloud Event attribute name to use for the RSS item summary                                |
-| MSG_CONTENT_TYPE            | `text/plain`                 | Cloud Event attribute name to use for the message content type                            |
+| Variable                    | Example value                  | Description                                                                               |
+|-----------------------------|--------------------------------|-------------------------------------------------------------------------------------------|
+| API_RESOLVER_BACKOFF        | `10s`                          | Time to sleep before a retry when resolver fails to accept all messages                   |
+| API_RESOLVER_URI            | `resolver:8080`                | [Resolver](https://github.com/awakari/resolver) dependency service URI                    |
+| LOG_LEVEL                   | `-4`                           | [Logging level](https://pkg.go.dev/golang.org/x/exp/slog#Level)                           |
+| FEED_URL                    | `https://techcrunch.com/feed ` | Feed URL to fetch and update                                                              |
+| FEED_TLS_SKIP_VERIFY        | `true`                         | Defines whether producer should skip the TLS certificate check when fetching the RSS feed |
+| FEED_UPDATE_INTERVAL_MIN    | `10s`                          | Minimum possible feed update interval                                                     |
+| FEED_UPDATE_INTERVAL_MAX    | `10m`                          | Maximum pssible feed update interval                                                      |
+| FEED_UPDATE_TIMEOUT         | `1m`                           | Timeout to fetch the RSS feed                                                             |
+| FEED_USER_AGENT             | `awakari-producer-rss/0.0.1`   | HTTP user agent to use to fetch any RSS feed                                              |
+| MSG_MD_KEY_FEED_CATEGORIES  | `feedcategories`               | Cloud Event attribute name to use for the feed categories                                 |
+| MSG_MD_KEY_FEED_DESCRIPTION | `feeddescription`              | Cloud Event attribute name to use for the feed description                                |
+| MSG_MD_KEY_FEED_IMAGE_TITLE | `feedimagetitle`               | Cloud Event attribute name to use for the feed image title                                |
+| MSG_MD_KEY_FEED_IMAGE_URL   | `feedimageurl`                 | Cloud Event attribute name to use for the feed image URL                                  |
+| MSG_MD_KEY_FEED_TITLE       | `feedtitle`                    | Cloud Event attribute name to use for the feed title                                      |
+| MSG_MD_KEY_AUTHOR           | `author`                       | Cloud Event attribute name to use for the RSS item author                                 |
+| MSG_MD_KEY_CATEGORIES       | `categories`                   | Cloud Event attribute name to use for the RSS item categories                             |
+| MSG_MD_KEY_GUID             | `rssitemguid`                  | Cloud Event attribute name to use for the RSS item GUID                                   |
+| MSG_MD_KEY_IMAGE_TITLE      | `imagetitle`                   | Cloud Event attribute name to use for the RSS item image title                            |
+| MSG_MD_KEY_IMAGE_URL        | `imageurl`                     | Cloud Event attribute name to use for the RSS item image URL                              |
+| MSG_MD_KEY_TITLE            | `title`                        | Cloud Event attribute name to use for the RSS item title                                  |
+| MSG_MD_KEY_LANGUAGE         | `language`                     | Cloud Event attribute name to use for the RSS item language                               |
+| MSG_MD_KEY_SUMMARY          | `summary`                      | Cloud Event attribute name to use for the RSS item summary                                |
+| MSG_CONTENT_TYPE            | `text/plain`                   | Cloud Event attribute name to use for the message content type                            |
 
 The only command line argument is the path to the file that is used to load the list of the feed URLs.
 Example file is located at [config/feed-urls.txt](config/feed-urls.txt).
@@ -100,12 +101,13 @@ See the [helm/producer-rss/templates/egress.yaml](helm/producer-rss/templates/eg
 
 Create a helm package from the sources:
 ```shell
-helm package helm/resolver/
+helm package helm/producer-rss/
 ```
 
 Install the helm chart:
 ```shell
-helm install resolver ./resolver-<CHART_VERSION>.tgz
+helm install -n awakari producer-rss ./producer-rss-<CHART_VERSION>.tgz \
+  --values helm/api/values-db-uri.yaml
 ```
 where `<CHART_VERSION>` is the helm chart version
 
