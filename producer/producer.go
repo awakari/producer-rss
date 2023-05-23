@@ -3,7 +3,6 @@ package producer
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/SlyMarbo/rss"
 	"github.com/awakari/client-sdk-go/model"
 	"github.com/cloudevents/sdk-go/binding/format/protobuf/v2/pb"
@@ -46,12 +45,10 @@ func (p producer) getNewMessages() (msgs []*pb.CloudEvent, nextTime time.Time, e
 	var msg *pb.CloudEvent
 	var itemErr error
 	for _, item := range p.feed.Items {
-		if p.timeMin.Before(item.Date) {
+		if item.Date.IsZero() || p.timeMin.Before(item.Date) {
 			msg, itemErr = p.conv.Convert(p.feed, item)
 			msgs = append(msgs, msg)
 			err = errors.Join(err, itemErr)
-		} else {
-			fmt.Printf("item date %s is before the min time %s\n", item.Date.Format(time.RFC3339), p.timeMin.Format(time.RFC3339))
 		}
 		if nextTime.Before(item.Date) {
 			nextTime = item.Date
