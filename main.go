@@ -89,7 +89,7 @@ func main() {
 	//
 	conv := converter.NewConverter(cfg.Message)
 	conv = converter.NewConverterLogging(conv, log)
-	prod := producer.NewProducer(feed, feedUpdTime, conv, ws, cfg.Api.Writer.Backoff)
+	prod := producer.NewProducer(feed, feedUpdTime, conv, ws, cfg.Api.Writer.Backoff, cfg.Api.Writer.BatchSize)
 	prod = producer.NewProducerLogging(prod, log)
 	//
 	var newFeedUpdTime time.Time

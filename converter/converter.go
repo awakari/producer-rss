@@ -7,6 +7,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"producer-rss/config"
 	"strings"
+	"time"
 )
 
 type Converter interface {
@@ -24,6 +25,14 @@ func NewConverter(cfgMsg config.MessageConfig) Converter {
 }
 
 func (c converter) Convert(feed *rss.Feed, item *rss.Item) (msg *pb.CloudEvent) {
+	//
+	var t time.Time
+	switch item.DateValid {
+	case true:
+		t = item.Date.UTC()
+	default:
+		t = time.Now().UTC()
+	}
 	attrs := map[string]*pb.CloudEventAttributeValue{
 		"subject": {
 			Attr: &pb.CloudEventAttributeValue_CeString{
@@ -32,10 +41,11 @@ func (c converter) Convert(feed *rss.Feed, item *rss.Item) (msg *pb.CloudEvent) 
 		},
 		"time": {
 			Attr: &pb.CloudEventAttributeValue_CeTimestamp{
-				CeTimestamp: timestamppb.New(item.Date),
+				CeTimestamp: timestamppb.New(t),
 			},
 		},
 	}
+	//
 	if feed.Author != "" {
 		attrs[c.cfgMsg.Metadata.KeyAuthor] = &pb.CloudEventAttributeValue{
 			Attr: &pb.CloudEventAttributeValue_CeString{

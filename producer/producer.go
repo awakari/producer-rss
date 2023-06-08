@@ -15,22 +15,22 @@ type Producer interface {
 }
 
 type producer struct {
-	feed          *rss.Feed
-	timeMin       time.Time
-	conv          converter.Converter
-	output        model.Writer[*pb.CloudEvent]
-	outputBackoff time.Duration
+	feed            *rss.Feed
+	timeMin         time.Time
+	conv            converter.Converter
+	output          model.Writer[*pb.CloudEvent]
+	outputBackoff   time.Duration
+	outputBatchSize uint32
 }
 
-const batchSize = 10
-
-func NewProducer(feed *rss.Feed, timeMin time.Time, conv converter.Converter, output model.Writer[*pb.CloudEvent], outputBackoff time.Duration) Producer {
+func NewProducer(feed *rss.Feed, timeMin time.Time, conv converter.Converter, output model.Writer[*pb.CloudEvent], outputBackoff time.Duration, outputBatchSize uint32) Producer {
 	return producer{
-		feed:          feed,
-		timeMin:       timeMin,
-		conv:          conv,
-		output:        output,
-		outputBackoff: outputBackoff,
+		feed:            feed,
+		timeMin:         timeMin,
+		conv:            conv,
+		output:          output,
+		outputBackoff:   outputBackoff,
+		outputBatchSize: outputBatchSize,
 	}
 }
 
@@ -41,19 +41,22 @@ func (p producer) Produce(ctx context.Context) (timeMax time.Time, err error) {
 		if item.Date.IsZero() || p.timeMin.Before(item.Date) {
 			msg = p.conv.Convert(p.feed, item)
 			msgBatch = append(msgBatch, msg)
-			if len(msgBatch) == batchSize {
+			if uint32(len(msgBatch)) == p.outputBatchSize {
 				// flush
 				err = errors.Join(err, p.sendMessages(ctx, msgBatch))
 				msgBatch = []*pb.CloudEvent{}
 			}
 		}
-		if timeMax.Before(item.Date) {
+		if item.DateValid && timeMax.Before(item.Date) {
 			timeMax = item.Date
 		}
 	}
 	// send the remaining messages, if any
 	if len(msgBatch) > 0 {
 		err = errors.Join(err, p.sendMessages(ctx, msgBatch))
+	}
+	if timeMax.IsZero() {
+		timeMax = time.Now().UTC()
 	}
 	return
 }
