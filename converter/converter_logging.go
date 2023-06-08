@@ -19,12 +19,8 @@ func NewConverterLogging(conv Converter, log *slog.Logger) Converter {
 	}
 }
 
-func (cl converterLogging) Convert(feed *rss.Feed, item *rss.Item) (msg *pb.CloudEvent, err error) {
-	msg, err = cl.conv.Convert(feed, item)
-	if err == nil {
-		cl.log.Debug(fmt.Sprintf("converter.Convert(_, %s): %s", item.ID, msg.Id))
-	} else {
-		cl.log.Warn(fmt.Sprintf("converter.Convert(_, %s): %s, %s", item.ID, msg.Id, err))
-	}
+func (cl converterLogging) Convert(feed *rss.Feed, item *rss.Item) (msg *pb.CloudEvent) {
+	msg = cl.conv.Convert(feed, item)
+	cl.log.Debug(fmt.Sprintf("converter.Convert(_, %s): %s", item.ID, msg.Id))
 	return
 }

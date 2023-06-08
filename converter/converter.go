@@ -10,7 +10,7 @@ import (
 )
 
 type Converter interface {
-	Convert(feed *rss.Feed, item *rss.Item) (msg *pb.CloudEvent, err error)
+	Convert(feed *rss.Feed, item *rss.Item) (msg *pb.CloudEvent)
 }
 
 type converter struct {
@@ -23,7 +23,7 @@ func NewConverter(cfgMsg config.MessageConfig) Converter {
 	}
 }
 
-func (c converter) Convert(feed *rss.Feed, item *rss.Item) (msg *pb.CloudEvent, err error) {
+func (c converter) Convert(feed *rss.Feed, item *rss.Item) (msg *pb.CloudEvent) {
 	attrs := map[string]*pb.CloudEventAttributeValue{
 		"subject": {
 			Attr: &pb.CloudEventAttributeValue_CeString{

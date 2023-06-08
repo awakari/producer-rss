@@ -18,11 +18,13 @@ type producer struct {
 	feed          *rss.Feed
 	timeMin       time.Time
 	conv          converter.Converter
-	output        model.WriteStream[*pb.CloudEvent]
+	output        model.Writer[*pb.CloudEvent]
 	outputBackoff time.Duration
 }
 
-func NewProducer(feed *rss.Feed, timeMin time.Time, conv converter.Converter, output model.WriteStream[*pb.CloudEvent], outputBackoff time.Duration) Producer {
+const batchSize = 10
+
+func NewProducer(feed *rss.Feed, timeMin time.Time, conv converter.Converter, output model.Writer[*pb.CloudEvent], outputBackoff time.Duration) Producer {
 	return producer{
 		feed:          feed,
 		timeMin:       timeMin,
@@ -33,33 +35,33 @@ func NewProducer(feed *rss.Feed, timeMin time.Time, conv converter.Converter, ou
 }
 
 func (p producer) Produce(ctx context.Context) (timeMax time.Time, err error) {
-	var msgs []*pb.CloudEvent
-	msgs, timeMax, err = p.getNewMessages()
-	if err == nil && len(msgs) > 0 {
-		err = p.sendMessages(ctx, msgs)
-	}
-	return
-}
-
-func (p producer) getNewMessages() (msgs []*pb.CloudEvent, nextTime time.Time, err error) {
+	var msgBatch []*pb.CloudEvent
 	var msg *pb.CloudEvent
-	var itemErr error
 	for _, item := range p.feed.Items {
 		if item.Date.IsZero() || p.timeMin.Before(item.Date) {
-			msg, itemErr = p.conv.Convert(p.feed, item)
-			msgs = append(msgs, msg)
-			err = errors.Join(err, itemErr)
+			msg = p.conv.Convert(p.feed, item)
+			msgBatch = append(msgBatch, msg)
+			if len(msgBatch) == batchSize {
+				// flush
+				err = errors.Join(err, p.sendMessages(ctx, msgBatch))
+				msgBatch = []*pb.CloudEvent{}
+			}
 		}
-		if nextTime.Before(item.Date) {
-			nextTime = item.Date
+		if timeMax.Before(item.Date) {
+			timeMax = item.Date
 		}
+	}
+	// send the remaining messages, if any
+	if len(msgBatch) > 0 {
+		err = errors.Join(err, p.sendMessages(ctx, msgBatch))
 	}
 	return
 }
 
 func (p producer) sendMessages(ctx context.Context, msgs []*pb.CloudEvent) (err error) {
 	msgCount := uint32(len(msgs))
-	var ackCount, n uint32
+	var ackCount uint32
+	var n uint32
 	for ackCount < msgCount {
 		n, err = p.output.WriteBatch(msgs[ackCount:])
 		ackCount += n

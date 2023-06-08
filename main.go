@@ -7,6 +7,7 @@ import (
 	"github.com/SlyMarbo/rss"
 	"github.com/awakari/client-sdk-go/api"
 	"golang.org/x/exp/slog"
+	"google.golang.org/grpc/metadata"
 	"net/http"
 	"os"
 	"producer-rss/config"
@@ -59,7 +60,7 @@ func main() {
 	var awakariClient api.Client
 	awakariClient, err = api.
 		NewClientBuilder().
-		WriteUri(cfg.Api.Writer.Uri).
+		WriterUri(cfg.Api.Writer.Uri).
 		Build()
 	if err != nil {
 		panic(fmt.Sprintf("failed to initialize the Awakari API client: %s", err))
@@ -67,13 +68,17 @@ func main() {
 	defer awakariClient.Close()
 	log.Info("initialized the Awakari API client")
 	//
-	groupIdCtx := context.WithValue(ctx, "x-awakari-group-id", "producer-rss")
-	ws, err := awakariClient.WriteMessages(groupIdCtx, "producer-rss")
+	groupIdCtx := metadata.AppendToOutgoingContext(
+		ctx,
+		"x-awakari-group-id", "producer-rss",
+		"x-awakari-user-id", "producer-rss",
+	)
+	ws, err := awakariClient.OpenMessagesWriter(groupIdCtx, "producer-rss")
 	if err != nil {
-		panic(fmt.Sprintf("failed to open the messages write stream: %s", err))
+		panic(fmt.Sprintf("failed to open the messages writer: %s", err))
 	}
 	defer ws.Close()
-	log.Info("opened the messages write stream")
+	log.Info("opened the messages writer")
 	//
 	var feed *rss.Feed
 	feed, err = rss.FetchByFunc(feedsClient.Get, cfg.Feed.Url)
