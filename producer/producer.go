@@ -35,10 +35,11 @@ func NewProducer(feed *rss.Feed, timeMin time.Time, conv converter.Converter, ou
 }
 
 func (p producer) Produce(ctx context.Context) (timeMax time.Time, err error) {
+	timeMax = p.timeMin
 	var msgBatch []*pb.CloudEvent
 	var msg *pb.CloudEvent
 	for _, item := range p.feed.Items {
-		if item.Date.IsZero() || p.timeMin.Before(item.Date) {
+		if !item.DateValid || p.timeMin.Before(item.Date) {
 			msg = p.conv.Convert(p.feed, item)
 			msgBatch = append(msgBatch, msg)
 			if uint32(len(msgBatch)) == p.outputBatchSize {

@@ -5,7 +5,7 @@ metadata:
     app: "producer-rss"
   name: "{{ include "producerRss.fullname" . }}-arxiv-org-astro-ph"
 spec:
-  schedule: "0 0 * * *"
+  schedule: "1 0 * * *"
   jobTemplate:
     spec:
       template:
@@ -13,6 +13,7 @@ spec:
           containers:
             - name: "{{ include "producerRss.fullname" . }}-arxiv-org-astro-ph"
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: "{{ .Values.image.pullPolicy }}"
               env:
                 - name: API_WRITER_BACKOFF
                   value: "{{ .Values.api.writer.backoff }}"
