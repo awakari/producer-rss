@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "producer-rss.name" -}}
+{{- define "producerRss.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "producer-rss.fullname" -}}
+{{- define "producerRss.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "producer-rss.chart" -}}
+{{- define "producerRss.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "producer-rss.labels" -}}
-helm.sh/chart: {{ include "producer-rss.chart" . }}
-{{ include "producer-rss.selectorLabels" . }}
+{{- define "producerRss.labels" -}}
+helm.sh/chart: {{ include "producerRss.chart" . }}
+{{ include "producerRss.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "producer-rss.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "producer-rss.name" . }}
+{{- define "producerRss.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "producerRss.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "producer-rss.serviceAccountName" -}}
+{{- define "producerRss.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "producer-rss.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "producerRss.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
