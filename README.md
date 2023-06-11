@@ -103,6 +103,15 @@ FEED_URL=https://hnrss.org/newest \
 Note the producer generally requires the custom network policy to be able to fetch the specified feeds.
 See the [helm/producer-rss/templates/egress.yaml](helm/producer-rss/templates/egress.yaml) source file for the details.
 
+Prepare the image pull secret:
+```shell
+kubectl create secret docker-registry github-registry \
+  --docker-server ghcr.io \
+  --docker-username=<GITHUB_USER_NAME> \ 
+  --docker-password=<GITHUB_CR_PAT> \
+  --docker-email=<USER_EMAIL>
+```
+
 ### 3.3.1. Helm
 
 Create a helm package from the sources:
