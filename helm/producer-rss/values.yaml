@@ -76,10 +76,10 @@ affinity: {}
 api:
   writer:
     backoff: "10s"
-    uri: "core-writer:50051"
+    uri: "writer:50051"
 db:
   protocol: mongodb
-  hostname: core-mongodb
+  hostname: mongodb
   port: 27017
   # Database name to use.
   name: producer-rss
@@ -88,7 +88,7 @@ db:
     raw: "" # used if db.password.secret.enabled is false
     secret:
       enabled: true
-      name: "core-mongodb"
+      name: "mongodb"
       key: "mongodb-root-password"
   table:
     # Database table name to use.
