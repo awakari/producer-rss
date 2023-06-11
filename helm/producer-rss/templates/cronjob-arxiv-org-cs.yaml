@@ -10,6 +10,10 @@ spec:
     spec:
       template:
         spec:
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           containers:
             - name: "{{ include "producerRss.fullname" . }}-arxiv-org-cs"
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
