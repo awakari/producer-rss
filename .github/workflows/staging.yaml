@@ -61,5 +61,4 @@ jobs:
       - name: Helm Upgrade
         run: |
           helm upgrade --install ${COMPONENT} ${COMPONENT}-0.0.0.tgz \
-            --set db.username=root \
-            --set db.password.secret.enabled=true
+            --set db.password.secret.enabled=false,db.protocol=mongodb+srv,db.tls.enabled=true,db.tls.insecure=true,db.hostname=${{ secrets.DB_HOST_DEMO }},db.username=${{ secrets.DB_USERNAME_DEMO }},db.password.raw=${{ secrets.DB_PASSWORD_DEMO }}

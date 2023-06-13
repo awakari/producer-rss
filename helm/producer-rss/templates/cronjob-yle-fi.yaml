@@ -24,7 +24,7 @@ spec:
                 - name: API_WRITER_URI
                   value: "{{ .Values.api.writer.uri }}"
                 - name: DB_URI
-                  value: "{{ .Values.db.protocol }}://{{ .Values.db.hostname }}:{{ .Values.db.port }}/?retryWrites=true&w=majority"
+                  value: "{{ .Values.db.protocol }}://{{ .Values.db.hostname }}/?retryWrites=true&w=majority"
                 - name: DB_NAME
                   value: {{ .Values.db.name }}
                 - name: DB_USERNAME

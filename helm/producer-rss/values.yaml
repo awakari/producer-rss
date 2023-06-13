@@ -79,8 +79,7 @@ api:
     uri: "writer:50051"
 db:
   protocol: mongodb
-  hostname: mongodb
-  port: 27017
+  hostname: "mongodb:27017"
   # Database name to use.
   name: producer-rss
   username: "root"
