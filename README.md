@@ -82,8 +82,7 @@ Example file is located at [config/feed-urls.txt](config/feed-urls.txt).
 ## 3.1. Prerequisites
 
 The Awakari Core system should be deployed.
-The producer uses the [writer](https://github.com/awakari/writer) service as an entry point.
-The API gateway is not required as far as the producer-rss is internal and owned component.
+The producer uses the [client-sdk-go](https://github.com/awakari/client-sdk-go) to write events.
 
 ## 3.2. Bare
 
