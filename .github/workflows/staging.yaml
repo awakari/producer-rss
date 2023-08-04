@@ -51,23 +51,23 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: helm/package/
 
-#      - name: Google Cloud Auth
-#        uses: 'google-github-actions/auth@v1'
-#        with:
-#          credentials_json: '${{ secrets.GKE_SA_KEY }}'
-#
-#      - uses: google-github-actions/setup-gcloud@v1
-#        with:
-#          project_id: ${{ secrets.GKE_RPOJECT_ID }}
-#
-#      - name: Kubeconfig
-#        run: |
-#          gcloud components install gke-gcloud-auth-plugin
-#          gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER_NAME_DEMO }} \
-#            --region ${{ secrets.GKE_CLUSTER_REGION }} \
-#            --project ${{ secrets.GKE_PROJECT_ID }}
-#
-#      - name: Helm Upgrade
-#        run: |
-#          helm upgrade --install ${COMPONENT} helm/package/${COMPONENT}-0.0.0.tgz \
-#            --set podAnnotations.commit=$(git rev-parse --short HEAD),db.password.secret.enabled=false,db.protocol=mongodb+srv,db.tls.enabled=true,db.tls.insecure=true,db.hostname=${{ secrets.DB_HOST_DEMO }},db.username=${{ secrets.DB_USERNAME_DEMO }},db.password.raw=${{ secrets.DB_PASSWORD_DEMO }}
+      - name: Google Cloud Auth
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GKE_SA_KEY }}'
+
+      - uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GKE_RPOJECT_ID }}
+
+      - name: Kubeconfig
+        run: |
+          gcloud components install gke-gcloud-auth-plugin
+          gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER_NAME_DEMO }} \
+            --region ${{ secrets.GKE_CLUSTER_REGION }} \
+            --project ${{ secrets.GKE_PROJECT_ID }}
+
+      - name: Helm Upgrade
+        run: |
+          helm upgrade --install ${COMPONENT} helm/package/${COMPONENT}-0.0.0.tgz \
+            --set podAnnotations.commit=$(git rev-parse --short HEAD),db.password.secret.enabled=false,db.protocol=mongodb+srv,db.tls.enabled=true,db.tls.insecure=true,db.hostname=${{ secrets.DB_HOST_DEMO }},db.username=${{ secrets.DB_USERNAME_DEMO }},db.password.raw=${{ secrets.DB_PASSWORD_DEMO }}
