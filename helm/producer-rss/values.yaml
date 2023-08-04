@@ -79,7 +79,7 @@ affinity: {}
 api:
   writer:
     backoff: "10s"
-    uri: "writer:50051"
+    uri: "core-resolver:50051"
 db:
   protocol: mongodb
   hostname: "mongodb:27017"

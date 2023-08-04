@@ -10,7 +10,7 @@ type Config struct {
 		Writer struct {
 			Backoff   time.Duration `envconfig:"API_WRITER_BACKOFF" default:"10s" required:"true"`
 			BatchSize uint32        `envconfig:"API_WRITER_BATCH_SIZE" default:"64" required:"true"`
-			Uri       string        `envconfig:"API_WRITER_URI" default:"writer:50051" required:"true"`
+			Uri       string        `envconfig:"API_WRITER_URI" default:"resolver:50051" required:"true"`
 		}
 	}
 	Db   DbConfig
