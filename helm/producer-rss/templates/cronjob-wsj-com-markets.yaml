@@ -3,9 +3,9 @@ kind: CronJob
 metadata:
   labels:
     app: "producer-rss"
-  name: "{{ include "producerRss.fullname" . }}-lenta-ru"
+  name: "{{ include "producerRss.fullname" . }}-wsj-com-markets"
 spec:
-  schedule: "11/11 * * * *"
+  schedule: "14/13 * * * *"
   jobTemplate:
     spec:
       template:
@@ -15,7 +15,7 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           containers:
-            - name: "{{ include "producerRss.fullname" . }}-lenta-ru"
+            - name: "{{ include "producerRss.fullname" . }}-yle-fi"
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
               imagePullPolicy: "{{ .Values.image.pullPolicy }}"
               env:
@@ -48,7 +48,7 @@ spec:
                 - name: LOG_LEVEL
                   value: "{{ .Values.log.level }}"
                 - name: FEED_URL
-                  value: "https://lenta.ru/rss/news"
+                  value: "https://feeds.a.dj.com/rss/RSSMarketsMain.xml"
                 - name: FEED_TLS_SKIP_VERIFY
                   value: "{{ .Values.feed.tls.skipVerify }}"
                 - name: FEED_UPDATE_INTERVAL_MIN

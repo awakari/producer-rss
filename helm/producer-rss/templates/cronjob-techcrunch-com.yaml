@@ -5,7 +5,7 @@ metadata:
     app: "producer-rss"
   name: "{{ include "producerRss.fullname" . }}-techcrunch-com"
 spec:
-  schedule: "0/29 * * * *"
+  schedule: "23/23 * * * *"
   jobTemplate:
     spec:
       template:
