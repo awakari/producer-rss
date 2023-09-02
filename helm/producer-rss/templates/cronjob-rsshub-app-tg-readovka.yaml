@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   labels:
     app: "producer-rss"
-  name: "{{ include "producerRss.fullname" . }}-rsshub-app-telegram-channel-readovkanews"
+  name: "{{ include "producerRss.fullname" . }}-rsshub-app-tg-readovka"
 spec:
   schedule: "0/5 * * * *"
   jobTemplate:
@@ -15,7 +15,7 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           containers:
-            - name: "{{ include "producerRss.fullname" . }}-rsshub-app-telegram-channel-readovkanews"
+            - name: "{{ include "producerRss.fullname" . }}-rsshub-app-tg-readovka"
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
               imagePullPolicy: "{{ .Values.image.pullPolicy }}"
               env:
