@@ -3,12 +3,12 @@ entries:
   producer-rss:
   - apiVersion: v2
     appVersion: latest
-    created: "2023-09-02T19:02:51.487698037Z"
+    created: "2023-09-03T16:47:56.121377016Z"
     description: A Helm chart for Awakari producer-rss
-    digest: c8b34d19f4596d466934eba7f2cf714ff267cb9486df874844290334124089ae
+    digest: 8c4ccd1d944c3381b6d1ca03898bca8dcec71a724002299df24c1298b0534ea0
     name: producer-rss
     type: application
     urls:
     - producer-rss-0.0.0.tgz
     version: 0.0.0
-generated: "2023-09-02T19:02:51.486404442Z"
+generated: "2023-09-03T16:47:56.120261989Z"
