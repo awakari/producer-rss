@@ -40,7 +40,7 @@ func (p producer) Produce(ctx context.Context) (timeMax time.Time, err error) {
 	var msgBatch []*pb.CloudEvent
 	var msg *pb.CloudEvent
 	for _, item := range p.feed.Items {
-		if !item.DateValid || item.Date.After(p.timeMin) {
+		if item.Date.IsZero() || item.Date.After(p.timeMin) {
 			fmt.Printf("item date %s is invalid or is after the min %s: %s\n", item.Date, p.timeMin, item.Title)
 			msg = p.conv.Convert(p.feed, item)
 			msgBatch = append(msgBatch, msg)
