@@ -3,7 +3,6 @@ package producer
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/SlyMarbo/rss"
 	"github.com/awakari/client-sdk-go/model"
 	"github.com/cloudevents/sdk-go/binding/format/protobuf/v2/pb"
@@ -49,9 +48,7 @@ func (p producer) Produce(ctx context.Context) (timeMax time.Time, err error) {
 				msgBatch = []*pb.CloudEvent{}
 			}
 		}
-		fmt.Printf("item date %s, valid? %t", item.Date, item.DateValid)
-		if item.DateValid && timeMax.Before(item.Date) {
-			fmt.Printf(", set new time max from %s which is before\n", timeMax)
+		if timeMax.Before(item.Date) {
 			timeMax = item.Date
 		}
 	}
