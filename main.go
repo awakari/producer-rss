@@ -99,10 +99,11 @@ func main() {
 	if err != nil {
 		log.Error(fmt.Sprintf("failed to process the feed: %s", err))
 	}
-	if newFeedUpdTime.After(feedUpdTime) {
-		log.Info(fmt.Sprintf("setting the new update time to %s", newFeedUpdTime.Format(time.RFC3339)))
-		err = stor.SetUpdateTime(ctx, cfg.Feed.Url, newFeedUpdTime)
+	if !newFeedUpdTime.After(feedUpdTime) {
+		newFeedUpdTime = time.Now().UTC()
 	}
+	log.Info(fmt.Sprintf("setting the new update time to %s", newFeedUpdTime.Format(time.RFC3339)))
+	err = stor.SetUpdateTime(ctx, cfg.Feed.Url, newFeedUpdTime)
 	if err != nil {
 		log.Error(fmt.Sprintf("failed to set the new update time for the feed: %s:", err))
 	}
