@@ -31,18 +31,18 @@ func TestProducer_Produce(t *testing.T) {
 		},
 		Items: []*rss.Item{
 			{
-				Title:     "item-0-title",
-				Summary:   "item-0-summary",
-				Content:   "item-0-content",
-				Link:      "https://test-feed-0.nz/item0",
-				Date:      time.Date(2023, 6, 9, 7, 31, 50, 0, time.UTC),
-				DateValid: true,
+				Title:   "item-0-title",
+				Summary: "item-0-summary",
+				Content: "item-0-content",
+				Link:    "https://test-feed-0.nz/item0",
+				Date:    time.Date(2023, 6, 9, 7, 31, 50, 0, time.UTC),
 			},
 			{
 				Title:   "item-1-title",
 				Summary: "item-1-summary",
 				Content: "item-1-content",
 				Link:    "https://test-feed-0.nz/item1",
+				Date:    time.Date(2023, 6, 9, 7, 32, 50, 0, time.UTC),
 			},
 		},
 	}
@@ -57,7 +57,7 @@ func TestProducer_Produce(t *testing.T) {
 	p = NewProducerLogging(p, slog.Default())
 	var timeNext time.Time
 	timeNext, err = p.Produce(context.TODO())
-	assert.False(t, timeMin.Before(timeNext))
+	assert.True(t, timeMin.Before(timeNext))
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(out.Msgs))
 	assert.Equal(t, "https://test-feed-0.nz", out.Msgs[0].Source)

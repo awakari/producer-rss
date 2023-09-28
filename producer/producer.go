@@ -3,6 +3,7 @@ package producer
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/SlyMarbo/rss"
 	"github.com/awakari/client-sdk-go/model"
 	"github.com/cloudevents/sdk-go/binding/format/protobuf/v2/pb"
@@ -39,7 +40,8 @@ func (p producer) Produce(ctx context.Context) (timeMax time.Time, err error) {
 	var msgBatch []*pb.CloudEvent
 	var msg *pb.CloudEvent
 	for _, item := range p.feed.Items {
-		if !item.DateValid || p.timeMin.Before(item.Date) {
+		if item.Date.After(p.timeMin) {
+			fmt.Printf("item date %s is after the min %s: %s\n", item.Date, p.timeMin, item.Title)
 			msg = p.conv.Convert(p.feed, item)
 			msgBatch = append(msgBatch, msg)
 			if uint32(len(msgBatch)) == p.outputBatchSize {
@@ -48,7 +50,7 @@ func (p producer) Produce(ctx context.Context) (timeMax time.Time, err error) {
 				msgBatch = []*pb.CloudEvent{}
 			}
 		}
-		if timeMax.Before(item.Date) {
+		if item.Date.After(timeMax) {
 			timeMax = item.Date
 		}
 	}

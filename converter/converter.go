@@ -27,11 +27,11 @@ func NewConverter(cfgMsg config.MessageConfig) Converter {
 func (c converter) Convert(feed *rss.Feed, item *rss.Item) (msg *pb.CloudEvent) {
 	//
 	var t time.Time
-	switch item.DateValid {
-	case true:
-		t = item.Date.UTC()
-	default:
+	switch {
+	case item.Date.IsZero():
 		t = time.Now().UTC()
+	default:
+		t = item.Date.UTC()
 	}
 	attrs := map[string]*pb.CloudEventAttributeValue{
 		"subject": {
