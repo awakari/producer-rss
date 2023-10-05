@@ -3,9 +3,9 @@ kind: CronJob
 metadata:
   labels:
     app: "producer-rss"
-  name: "{{ include "producerRss.fullname" . }}-yle-fi"
+  name: "{{ include "producerRss.fullname" . }}-nplus1-ru"
 spec:
-  schedule: "29 * * * *"
+  schedule: "0 * * * *"
   jobTemplate:
     spec:
       template:
@@ -15,7 +15,7 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           containers:
-            - name: "{{ include "producerRss.fullname" . }}-yle-fi"
+            - name: "{{ include "producerRss.fullname" . }}-nplus1-ru"
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
               imagePullPolicy: "{{ .Values.image.pullPolicy }}"
               env:
@@ -48,7 +48,7 @@ spec:
                 - name: LOG_LEVEL
                   value: "{{ .Values.log.level }}"
                 - name: FEED_URL
-                  value: "https://feeds.yle.fi/uutiset/v1/majorHeadlines/YLE_UUTISET.rss"
+                  value: "https://nplus1.ru/rss"
                 - name: FEED_TLS_SKIP_VERIFY
                   value: "{{ .Values.feed.tls.skipVerify }}"
                 - name: FEED_UPDATE_INTERVAL_MIN
