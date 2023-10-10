@@ -3,9 +3,9 @@ kind: CronJob
 metadata:
   labels:
     app: "producer-rss"
-  name: "{{ include "producerRss.fullname" . }}-gizmodo-com"
+  name: "{{ include "producerRss.fullname" . }}-mashable-com"
 spec:
-  schedule: "0/15 * * * *"
+  schedule: "10/15 * * * *"
   jobTemplate:
     spec:
       template:

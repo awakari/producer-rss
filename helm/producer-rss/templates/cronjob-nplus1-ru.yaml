@@ -5,7 +5,7 @@ metadata:
     app: "producer-rss"
   name: "{{ include "producerRss.fullname" . }}-nplus1-ru"
 spec:
-  schedule: "0 * * * *"
+  schedule: "19 * * * *"
   jobTemplate:
     spec:
       template:

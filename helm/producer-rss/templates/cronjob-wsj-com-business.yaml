@@ -5,7 +5,7 @@ metadata:
     app: "producer-rss"
   name: "{{ include "producerRss.fullname" . }}-wsj-com-business"
 spec:
-  schedule: "13/13 * * * *"
+  schedule: "13/23 * * * *"
   jobTemplate:
     spec:
       template:

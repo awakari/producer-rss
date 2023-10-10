@@ -5,7 +5,7 @@ metadata:
     app: "producer-rss"
   name: "{{ include "producerRss.fullname" . }}-yle-fi"
 spec:
-  schedule: "29 * * * *"
+  schedule: "26 * * * *"
   jobTemplate:
     spec:
       template:

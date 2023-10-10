@@ -22,3 +22,4 @@
 *.tmproj
 .vscode/
 values-dev.yaml
+templates/all-jobs-schedule.txt

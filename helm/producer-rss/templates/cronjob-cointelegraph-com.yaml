@@ -5,7 +5,7 @@ metadata:
     app: "producer-rss"
   name: "{{ include "producerRss.fullname" . }}-contelegraph-com"
 spec:
-  schedule: "0 * * * *"
+  schedule: "3 * * * *"
   jobTemplate:
     spec:
       template:

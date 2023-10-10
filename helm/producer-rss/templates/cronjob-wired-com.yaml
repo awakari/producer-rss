@@ -5,7 +5,7 @@ metadata:
     app: "producer-rss"
   name: "{{ include "producerRss.fullname" . }}-wired-com"
 spec:
-  schedule: "0/15 * * * *"
+  schedule: "24/15 * * * *"
   jobTemplate:
     spec:
       template:
