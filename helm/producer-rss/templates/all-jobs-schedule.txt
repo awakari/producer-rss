@@ -1,6 +1,6 @@
 0 7 * * * arxiv-org-astro-ph
 1 7 * * * arxiv-org-cs
-2/10 * * * * cnn-com
+2/29 * * * * cnn-com
 3 * * * * cointelegraph
 4 8 * * * elementy
 5/12 * * * * forbes
@@ -28,3 +28,14 @@
 17/23 * * * * wsj-com-world
 26 * * * * yle-fi
 25/20 * * * * youtube-com-popular
+
+29/19 * * * * https://www.engineering.com/jobs/rss/
+30 0/12 * * * https://phys.org/rss-feed/journals/astrophysical-journal/
+31 * * * * https://www.linuxtoday.com/feed/
+22 0/12 * * * https://www.planetary.org/rss/articles
+32 * * * * https://www.youtube.com/feeds/videos.xml?channel_id=UCq-Fj5jknLsUf-MWSy4_brA
+33 6 * * * https://www.youtube.com/feeds/videos.xml?channel_id=UCbCmjCuTUZos6Inko4u57UQ
+4/15 * * * * https://www.youtube.com/feeds/videos.xml?channel_id=UCpEhnqL0y41EpW2TvWAHD7Q
+34 5 * * * https://www.youtube.com/feeds/videos.xml?channel_id=UC5A-Wp9ujcr5g9sYagAafEA
+5 * * * * https://www.youtube.com/feeds/videos.xml?channel_id=UC295-Dw_tDNtZXFeAPAW6Aw
+35 * * * * https://www.nytimes.com/wirecutter/feed/
