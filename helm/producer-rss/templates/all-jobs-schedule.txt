@@ -39,3 +39,6 @@
 34 5 * * * https://www.youtube.com/feeds/videos.xml?channel_id=UC5A-Wp9ujcr5g9sYagAafEA
 5 * * * * https://www.youtube.com/feeds/videos.xml?channel_id=UC295-Dw_tDNtZXFeAPAW6Aw
 35 * * * * https://www.nytimes.com/wirecutter/feed/
+0/14 * * * * https://www.ft.com/world?format=rss
+1/16 * * * * https://www.ft.com/financials?format=rss
+37 * * * * https://www.ft.com/emerging-markets?format=rss
