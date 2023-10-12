@@ -1,5 +1,6 @@
 0 7 * * * arxiv-org-astro-ph
 1 7 * * * arxiv-org-cs
+2/29 * * * * cnn-com
 3 * * * * cointelegraph
 4 8 * * * elementy
 5/12 * * * * forbes
