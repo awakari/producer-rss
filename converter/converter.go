@@ -34,11 +34,6 @@ func (c converter) Convert(feed *rss.Feed, item *rss.Item) (msg *pb.CloudEvent) 
 		t = item.Date.UTC()
 	}
 	attrs := map[string]*pb.CloudEventAttributeValue{
-		"subject": {
-			Attr: &pb.CloudEventAttributeValue_CeString{
-				CeString: item.Link,
-			},
-		},
 		"time": {
 			Attr: &pb.CloudEventAttributeValue_CeTimestamp{
 				CeTimestamp: timestamppb.New(t),
@@ -157,7 +152,7 @@ func (c converter) Convert(feed *rss.Feed, item *rss.Item) (msg *pb.CloudEvent) 
 	msg = &pb.CloudEvent{
 		Id:          uuid.NewString(),
 		SpecVersion: c.cfgMsg.Metadata.SpecVersion,
-		Source:      feed.Link,
+		Source:      item.Link,
 		Type:        "com.github.awakari.producer-rss",
 		Attributes:  attrs,
 	}
