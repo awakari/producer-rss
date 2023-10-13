@@ -56,6 +56,7 @@ type MetadataConfig struct {
 	KeyFeedImageTitle  string `envconfig:"MSG_MD_KEY_FEED_IMAGE_TITLE" default:"feedimagetitle" required:"true"`
 	KeyFeedImageUrl    string `envconfig:"MSG_MD_KEY_FEED_IMAGE_URL" default:"feedimageurl" required:"true"`
 	KeyFeedTitle       string `envconfig:"MSG_MD_KEY_FEED_TITLE" default:"feedtitle" required:"true"`
+	KeyFeedUrl         string `envconfig:"MSG_MD_KEY_FEED_URL" default:"feedurl"`
 	//
 	KeyAuthor     string `envconfig:"MSG_MD_KEY_AUTHOR" default:"author" required:"true"`
 	KeyCategories string `envconfig:"MSG_MD_KEY_CATEGORIES" default:"categories" required:"true"`

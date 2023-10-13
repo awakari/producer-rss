@@ -92,6 +92,13 @@ func (c converter) Convert(feed *rss.Feed, item *rss.Item) (msg *pb.CloudEvent) 
 			},
 		}
 	}
+	if feed.UpdateURL != "" {
+		attrs[c.cfgMsg.Metadata.KeyFeedUrl] = &pb.CloudEventAttributeValue{
+			Attr: &pb.CloudEventAttributeValue_CeUri{
+				CeUri: feed.UpdateURL,
+			},
+		}
+	}
 	if item.ID != "" {
 		attrs["subject"] = &pb.CloudEventAttributeValue{
 			Attr: &pb.CloudEventAttributeValue_CeString{
