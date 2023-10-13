@@ -59,7 +59,6 @@ type MetadataConfig struct {
 	//
 	KeyAuthor     string `envconfig:"MSG_MD_KEY_AUTHOR" default:"author" required:"true"`
 	KeyCategories string `envconfig:"MSG_MD_KEY_CATEGORIES" default:"categories" required:"true"`
-	KeyGuid       string `envconfig:"MSG_MD_KEY_GUID" default:"rssitemguid" required:"true"`
 	KeyImageTitle string `envconfig:"MSG_MD_KEY_IMAGE_TITLE" default:"imagetitle" required:"true"`
 	KeyImageUrl   string `envconfig:"MSG_MD_KEY_IMAGE_URL" default:"imageurl" required:"true"`
 	KeyLanguage   string `envconfig:"MSG_MD_KEY_LANGUAGE" default:"language" required:"true"`

@@ -66,7 +66,6 @@ The service is configurable using the environment variables:
 | MSG_MD_KEY_FEED_TITLE       | `feedtitle`                                              | Cloud Event attribute name to use for the feed title                                        |
 | MSG_MD_KEY_AUTHOR           | `author`                                                 | Cloud Event attribute name to use for the RSS item author                                   |
 | MSG_MD_KEY_CATEGORIES       | `categories`                                             | Cloud Event attribute name to use for the RSS item categories                               |
-| MSG_MD_KEY_GUID             | `rssitemguid`                                            | Cloud Event attribute name to use for the RSS item GUID                                     |
 | MSG_MD_KEY_IMAGE_TITLE      | `imagetitle`                                             | Cloud Event attribute name to use for the RSS item image title                              |
 | MSG_MD_KEY_IMAGE_URL        | `imageurl`                                               | Cloud Event attribute name to use for the RSS item image URL                                |
 | MSG_MD_KEY_TITLE            | `title`                                                  | Cloud Event attribute name to use for the RSS item title                                    |

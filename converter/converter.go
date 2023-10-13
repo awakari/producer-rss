@@ -93,7 +93,7 @@ func (c converter) Convert(feed *rss.Feed, item *rss.Item) (msg *pb.CloudEvent) 
 		}
 	}
 	if item.ID != "" {
-		attrs[c.cfgMsg.Metadata.KeyGuid] = &pb.CloudEventAttributeValue{
+		attrs["subject"] = &pb.CloudEventAttributeValue{
 			Attr: &pb.CloudEventAttributeValue_CeString{
 				CeString: item.ID,
 			},

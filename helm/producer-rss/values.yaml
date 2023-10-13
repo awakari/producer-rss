@@ -119,7 +119,6 @@ message:
       feedTitle: "feedtitle"
       author: "author"
       categories: "categories"
-      guid: "rssitemguid"
       imageTitle: "imagetitle"
       imageUrl: "imageurl"
       language: "language"
