@@ -28,7 +28,6 @@
 17/23 * * * * wsj-com-world
 26 * * * * yle-fi
 25/20 * * * * youtube-com-popular
-
 29/19 * * * * https://www.engineering.com/jobs/rss/
 30 0/12 * * * https://phys.org/rss-feed/journals/astrophysical-journal/
 31 * * * * https://www.linuxtoday.com/feed/

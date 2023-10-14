@@ -48,7 +48,7 @@ spec:
                 - name: LOG_LEVEL
                   value: "{{ .Values.log.level }}"
                 - name: FEED_URL
-                  value: "https://habr.com/ru/rss/articles/"
+                  value: "https://habr.com/en/rss/articles/"
                 - name: FEED_TLS_SKIP_VERIFY
                   value: "{{ .Values.feed.tls.skipVerify }}"
                 - name: FEED_UPDATE_INTERVAL_MIN
